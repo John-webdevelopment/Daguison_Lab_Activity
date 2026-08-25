@@ -3,17 +3,14 @@ function calculateItemAmount(price, quantity) {
 }
 
 function calculateDiscount(subtotal) {
-  let discountRate = 0;
-
   if (subtotal >= 5000) {
-    discountRate = 0.10;
+    return subtotal * 0.10;
   } else if (subtotal >= 3000) {
-    discountRate = 0.07;
+    return subtotal * 0.07;
   } else if (subtotal >= 1000) {
-    discountRate = 0.05;
+    return subtotal * 0.05;
   }
-
-  return subtotal * discountRate;
+  return 0;
 }
 
 function getDeliveryFee(option) {
@@ -37,11 +34,9 @@ function formatCurrency(amount) {
 }
 
 function generateProductFields() {
-  const productCount =
-    Number(document.getElementById("productCount").value);
 
-  const productsContainer =
-    document.getElementById("productsContainer");
+  const productCount = Number(document.getElementById("productCount").value);
+  const productsContainer = document.getElementById("productsContainer");
 
   productsContainer.innerHTML = "";
 
@@ -71,20 +66,12 @@ function generateProductFields() {
 
 function handleCalculateOrder() {
 
-  const customerName =
-    document.getElementById("customerName").value.trim();
+  const customerName = document.getElementById("customerName").value.trim();
+  const productCount = Number(document.getElementById("productCount").value);
+  const deliveryOption = Number(document.getElementById("deliveryOption").value);
 
-  const productCount =
-    Number(document.getElementById("productCount").value);
-
-  const deliveryOption =
-    Number(document.getElementById("deliveryOption").value);
-
-  const validationMessage =
-    document.getElementById("validationMessage");
-
-  const orderSummary =
-    document.getElementById("orderSummary");
+  const validationMessage = document.getElementById("validationMessage");
+  const orderSummary = document.getElementById("orderSummary");
 
   validationMessage.textContent = "";
   orderSummary.textContent = "";
@@ -95,18 +82,15 @@ function handleCalculateOrder() {
   }
 
   if (!Number.isInteger(productCount) || productCount <= 0) {
-    validationMessage.textContent =
-      "Please enter a valid number of products.";
+    validationMessage.textContent = "Please enter a valid number of products.";
     return;
   }
 
-  if (
-    document.getElementById("productsContainer").children.length !==
-    productCount
-  ) {
+  const productsContainer = document.getElementById("productsContainer");
+
+  if (productsContainer.children.length !== productCount) {
     generateProductFields();
-    validationMessage.textContent =
-      "Please fill in the product details.";
+    validationMessage.textContent = "Please fill in the product details.";
     return;
   }
 
@@ -115,47 +99,39 @@ function handleCalculateOrder() {
 
   for (let i = 0; i < productCount; i++) {
 
-    const name =
-      document.getElementById(`productName-${i}`).value.trim();
-
-    const price =
-      Number(document.getElementById(`productPrice-${i}`).value);
-
-    const quantity =
-      Number(document.getElementById(`productQuantity-${i}`).value);
+    const name = document.getElementById(`productName-${i}`).value.trim();
+    const price = Number(document.getElementById(`productPrice-${i}`).value);
+    const quantity = Number(document.getElementById(`productQuantity-${i}`).value);
 
     if (name === "") {
-      validationMessage.textContent =
-        `Product ${i + 1}: name is required.`;
+      validationMessage.textContent = `Product ${i + 1}: name is required.`;
       return;
     }
 
     if (!Number.isFinite(price) || price <= 0) {
-      validationMessage.textContent =
-        `Product ${i + 1}: price must be a valid positive number.`;
+      validationMessage.textContent = `Product ${i + 1}: price must be a valid positive number.`;
       return;
     }
 
     if (!Number.isFinite(quantity) || quantity <= 0) {
-      validationMessage.textContent =
-        `Product ${i + 1}: quantity must be a valid positive number.`;
+      validationMessage.textContent = `Product ${i + 1}: quantity must be a valid positive number.`;
       return;
     }
 
-    const amount =
-      calculateItemAmount(price, quantity);
+    const amount = calculateItemAmount(price, quantity);
 
     subtotal += amount;
 
     productDetails +=
-      `${i + 1}. ${name}\n` +
-      `   Price: ₱${formatCurrency(price)}\n` +
-      `   Quantity: ${quantity}\n` +
-      `   Amount: ₱${formatCurrency(amount)}\n\n`;
+`${i + 1}. ${name}
+   Price: ₱${formatCurrency(price)}
+   Quantity: ${quantity}
+   Amount: ₱${formatCurrency(amount)}
+
+`;
   }
 
-  const discountAmount =
-    calculateDiscount(subtotal);
+  const discountAmount = calculateDiscount(subtotal);
 
   let discountRate = 0;
 
@@ -167,8 +143,7 @@ function handleCalculateOrder() {
     discountRate = 5;
   }
 
-  const deliveryFee =
-    getDeliveryFee(deliveryOption);
+  const deliveryFee = getDeliveryFee(deliveryOption);
 
   let deliveryType = "Store Pickup";
 
@@ -184,46 +159,35 @@ function handleCalculateOrder() {
       break;
   }
 
-  const finalAmount =
-    subtotal - discountAmount + deliveryFee;
+  const finalAmount = subtotal - discountAmount + deliveryFee;
 
   orderSummary.textContent =
-    `MINI STORE CHECKOUT SYSTEM\n\n` +
-    `Customer: ${customerName}\n\n` +
-    `${productDetails}` +
-    `ORDER SUMMARY\n` +
-    `Subtotal: ₱${formatCurrency(subtotal)}\n` +
-    `Discount Rate: ${discountRate}%\n` +
-    `Discount Amount: ₱${formatCurrency(discountAmount)}\n` +
-    `Delivery Type: ${deliveryType}\n` +
-    `Delivery Fee: ₱${formatCurrency(deliveryFee)}\n` +
-    `Final Amount: ₱${formatCurrency(finalAmount)}`;
+`MINI STORE CHECKOUT SYSTEM
+
+Customer: ${customerName}
+
+${productDetails}ORDER SUMMARY
+
+Subtotal: ₱${formatCurrency(subtotal)}
+Discount Rate: ${discountRate}%
+Discount Amount: ₱${formatCurrency(discountAmount)}
+Delivery Type: ${deliveryType}
+Delivery Fee: ₱${formatCurrency(deliveryFee)}
+Final Amount: ₱${formatCurrency(finalAmount)}`;
 }
 
 if (typeof document !== "undefined") {
 
-  const productCount =
-    document.getElementById("productCount");
+  const productCountInput = document.getElementById("productCount");
+  const calculateBtn = document.getElementById("calculateBtn");
 
-  const calculateBtn =
-    document.getElementById("calculateBtn");
+  if (productCountInput) {
+    productCountInput.addEventListener("input", generateProductFields);
+    productCountInput.addEventListener("change", generateProductFields);
+  }
 
-  if (productCount && calculateBtn) {
-
-    productCount.addEventListener(
-      "input",
-      generateProductFields
-    );
-
-    productCount.addEventListener(
-      "change",
-      generateProductFields
-    );
-
-    calculateBtn.addEventListener(
-      "click",
-      handleCalculateOrder
-    );
+  if (calculateBtn) {
+    calculateBtn.addEventListener("click", handleCalculateOrder);
   }
 }
 
